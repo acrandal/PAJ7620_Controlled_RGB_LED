@@ -39,7 +39,7 @@ int palette = 0;
 #define LED_PIN A1
 
 #define ANIMATION_CNT 6
-#define PALETTE_CNT 4
+#define PALETTE_CNT 6
 #define DURATION_MAX 10000
 
 int animList[ANIMATION_CNT] = {
@@ -80,7 +80,9 @@ AlaPalette paletteList[PALETTE_CNT] = {
   alaGUColors,
   alaPalRgb,
   alaPalRainbow,
-  alaPalFire
+  alaPalFire,
+  alaPalHeat,
+  alaPalCool
 };
 
 /*
@@ -225,15 +227,24 @@ void decrementDuration(int step_down) {
   duration -= step_down;
   if( duration < 500 ) 
     { duration = 500; }
-  updateAnimation();
+  updateSpeed();
 }
 
 void incrementDuration(int step_up) {
   duration += step_up;
-  Serial.println(duration);
-  updateAnimation();
+  if( duration > DURATION_MAX ) {
+    duration = DURATION_MAX;
+  }
+  updateSpeed();
 }
 
+
+// **** ***************************************************************************
+void updateSpeed() {
+  rgbStrip.setSpeed(duration);
+  last_stamp = millis();
+  curr_mode = ACTIVE;
+}
 
 // **** ***************************************************************************
 void updateAnimation()
