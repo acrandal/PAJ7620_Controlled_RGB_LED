@@ -18,7 +18,7 @@ RevEng_PAJ7620 sensor = RevEng_PAJ7620();
 AlaLedRgb rgbStrip;
 
 
-#define TIMEOUT_MILLIS 10000
+#define TIMEOUT_MILLIS 30000
 long long int last_stamp = 0;
 
 enum Mode { ACTIVE, IDLING };
@@ -31,7 +31,7 @@ int palette = 0;
 
 #define DEFAULT_ANIMATION  4
 #define DEFAULT_DURATION   5000
-#define DEFAULT_PALETTE    1
+#define DEFAULT_PALETTE    0
 
 #define ALA_BRIGHTNESS 25
 
@@ -39,7 +39,7 @@ int palette = 0;
 #define LED_PIN A1
 
 #define ANIMATION_CNT 6
-#define PALETTE_CNT 3
+#define PALETTE_CNT 4
 #define DURATION_MAX 10000
 
 int animList[ANIMATION_CNT] = {
@@ -66,10 +66,21 @@ int animList[ANIMATION_CNT] = {
 
 };
 
+// GU Color palette
+AlaColor GUBlue = 0x0410FF;
+AlaColor GURed = 0xF8100E;
+AlaColor GUGrey = 0xC1C6C8;
+AlaColor alaGUColors_[] =
+{
+  0xFFFFFF, GUBlue, GUBlue, GUGrey, GUBlue, GURed
+};
+AlaPalette alaGUColors = {6, alaGUColors_};
+
 AlaPalette paletteList[PALETTE_CNT] = {
-    alaPalRgb,
-    alaPalRainbow,
-    alaPalFire
+  alaGUColors,
+  alaPalRgb,
+  alaPalRainbow,
+  alaPalFire
 };
 
 /*
