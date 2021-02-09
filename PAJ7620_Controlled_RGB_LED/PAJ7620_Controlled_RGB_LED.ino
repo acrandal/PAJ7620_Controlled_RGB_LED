@@ -17,56 +17,53 @@ RevEng_PAJ7620 sensor = RevEng_PAJ7620();
 
 AlaLedRgb rgbStrip;
 
-
-#define TIMEOUT_MILLIS 30000
+#define TIMEOUT_MILLIS 120000
 long long int last_stamp = 0;
 
 enum Mode { ACTIVE, IDLING };
 Mode curr_mode = ACTIVE;
 
-
 int animation = 0;
 int duration = 2000;
 int palette = 0;
+
+#define LED_COUNT 64
+#define LED_PIN A3
+
+#define ALA_BRIGHTNESS 100
 
 #define DEFAULT_ANIMATION  4
 #define DEFAULT_DURATION   5000
 #define DEFAULT_PALETTE    0
 
-#define ALA_BRIGHTNESS 25
-
-#define LED_COUNT 64
-#define LED_PIN A1
-
-#define ANIMATION_CNT 6
+#define ANIMATION_CNT 12
 #define PALETTE_CNT 6
 #define DURATION_MAX 10000
 
 int animList[ANIMATION_CNT] = {
-    //ALA_ON,
     ALA_LARSONSCANNER2,
     ALA_PIXELSMOOTHSHIFTRIGHT,
     ALA_COMET,
     ALA_PIXELBOUNCE,
     ALA_SPARKLE2,
     ALA_BUBBLES,
+    ALA_PLASMA,
+    ALA_PIXELSHIFTRIGHT,
+    ALA_COMETCOL,
+    ALA_BOUNCINGBALLS,
+    ALA_SPARKLE,
+    ALA_MOVINGBARS,
 
-    //ALA_PLASMA,           // --
-    //ALA_FIRE
-
-    //ALA_FADEINOUT,
-    //ALA_PIXELSHIFTRIGHT,
-    //ALA_COMETCOL,
-    //ALA_GLOW,
+    //ALA_ON,
+    //ALA_FIRE,
     //ALA_CYCLECOLORS,
+    //ALA_GLOW,
+    //ALA_FADEINOUT,
     //ALA_FADECOLORS,
-    //ALA_BOUNCINGBALLS,
-    //ALA_SPARKLE,
-    //ALA_MOVINGBARS,
 
 };
 
-// GU Color palette
+// Gonzaga University (GU) Color palette
 AlaColor GUBlue = 0x0410FF;
 AlaColor GURed = 0xF8100E;
 AlaColor GUGrey = 0xC1C6C8;
@@ -117,6 +114,8 @@ void setup()
   Serial.println("Done.");
 
   led_blink(1000);
+
+  delay(5000);
 
   Serial.print("Proceeding to lighting & processing");
   rgbStrip.initWS2812(LED_COUNT, LED_PIN);
@@ -202,13 +201,15 @@ void turnOn() {
 void incrementPalette() {
   palette++;
   palette >= PALETTE_CNT ? palette = 0 : palette = palette;
-  updateAnimation(); 
+  updatePalette();
+  //updateAnimation(); 
 }
 
 void decrementPalette() {
   palette--;
   palette < 0 ? palette = PALETTE_CNT - 1 : palette = palette;
-  updateAnimation();
+  updatePalette();
+  //updateAnimation();
 }
 
 void decrementAnimation() {
@@ -238,6 +239,12 @@ void incrementDuration(int step_up) {
   updateSpeed();
 }
 
+// **** ***************************************************************************
+void updatePalette() {
+  rgbStrip.setPalette(paletteList[palette % PALETTE_CNT]);
+  last_stamp = millis();
+  curr_mode = ACTIVE;
+}
 
 // **** ***************************************************************************
 void updateSpeed() {
