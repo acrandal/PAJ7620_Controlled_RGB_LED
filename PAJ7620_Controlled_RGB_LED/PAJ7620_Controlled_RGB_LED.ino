@@ -6,6 +6,7 @@
  *  
  *  @license MIT
  * 
+ * NOTE: Uses GitHub/acrandal/ALA repo for ALA library
  */
 
 #include "AlaLedRgb.h"
@@ -17,7 +18,7 @@ RevEng_PAJ7620 sensor = RevEng_PAJ7620();
 
 AlaLedRgb rgbStrip;
 
-#define TIMEOUT_MILLIS 120000
+#define TIMEOUT_MILLIS 600000
 long long int last_stamp = 0;
 
 enum Mode { ACTIVE, IDLING };
@@ -131,35 +132,41 @@ void loop()
   Gesture gesture;                  // Gesture is an enum type from RevEng_PAJ7620.h
   gesture = sensor.readGesture();   // Read back current gesture (if any) of type Gesture
 
-  switch (gesture)
+  if(curr_mode == IDLING && gesture != GES_NONE) {  // Wake up, but don't alter animation
+    updateAnimation();
+  }
+  else
   {
-    // Control animation with left & right
-    case GES_LEFT:    decrementAnimation(); break;
-    case GES_RIGHT:   incrementAnimation(); break;
-
-    case GES_UP:    incrementPalette(); break;
-    case GES_DOWN:  decrementPalette(); break;
-
-    // Control animation speed
-    case GES_CLOCKWISE: decrementDuration(1000); break;
-    case GES_ANTICLOCKWISE: incrementDuration(1000); break;
-
-    // Toggle lights on/off
-    case GES_FORWARD:
-      g_LEDEnable = !g_LEDEnable;
-      if( g_LEDEnable ) {
-        turnOn();
-      } else {
-        turnOff();
-      }
-      break;
-
-    case GES_WAVE:
-      if( sensor.getWaveCount() > 5 ) {
-        setALADefaults();
-        updateAnimation();
-      }
-      break;
+    switch (gesture)
+    {
+      // Control animation with left & right
+      case GES_LEFT:    decrementAnimation(); break;
+      case GES_RIGHT:   incrementAnimation(); break;
+  
+      case GES_UP:    incrementPalette(); break;
+      case GES_DOWN:  decrementPalette(); break;
+  
+      // Control animation speed
+      case GES_CLOCKWISE: decrementDuration(1000); break;
+      case GES_ANTICLOCKWISE: incrementDuration(1000); break;
+  
+      // Toggle lights on/off
+      case GES_FORWARD:
+        g_LEDEnable = !g_LEDEnable;
+        if( g_LEDEnable ) {
+          turnOn();
+        } else {
+          turnOff();
+        }
+        break;
+  
+      case GES_WAVE:
+        if( sensor.getWaveCount() > 5 ) {
+          setALADefaults();
+          updateAnimation();
+        }
+        break;
+    }
   }
   
   // Go into timeout idle mode
